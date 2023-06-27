@@ -4,6 +4,7 @@ import {
   Ionicons,
   Foundation,
   AntDesign,
+  FontAwesome5,
   MaterialIcons,
 } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,7 +19,7 @@ const { width, height } = Dimensions.get("window");
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigation = () => {
+const BottomTabNavigation = ({route}) => {
   const insets = useSafeAreaInsets();
 
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -44,6 +45,8 @@ const BottomTabNavigation = () => {
     };
   }, []);
 
+  const { vehicleIcon } = route.params || {};
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -68,7 +71,7 @@ const BottomTabNavigation = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Foundation name="home" size={28} color={color} />
+            <FontAwesome5 name="map" size={28} color={color} />
           ),
         }}
       />
@@ -78,10 +81,11 @@ const BottomTabNavigation = () => {
         component={StationScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="electric-car" size={28} color={color} />
+            <MaterialIcons  name={vehicleIcon}  size={28} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="ProfileScreen"
         component={ProfileScreen}

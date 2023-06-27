@@ -43,8 +43,8 @@ const SplashScreen = ({}) => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                //navigation.navigate("RegisterScreen");
-                navigation.navigate("BottomTabbarNavigation");
+                navigation.navigate("SelectVehicle");
+               // navigation.navigate("BottomTabbarNavigation");
                 console.log("Register");
               }}
             >

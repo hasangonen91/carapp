@@ -5,6 +5,7 @@ import BottomTabbarNavigation from "../BottomTabbarNavigation/BottomTabbarNaviga
 import SplashScreen from "../../screens/Splash/SplashScreen";
 import LoginScreen from "../../screens/LoginAndRegister/LoginScreen/LoginScreen";
 import RegisterScreen from "../../screens/LoginAndRegister/RegisterScreen/RegisterScreen";
+import SelectVehicle from "../../screens/Splash/SelectVehicle";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,10 +18,13 @@ const StackNavigation = () => {
       }}
     >
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
+      <Stack.Screen name="SelectVehicle" component={SelectVehicle} />
+
 
       <Stack.Screen
         name="BottomTabbarNavigation"
         component={BottomTabbarNavigation}
+
       />
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} />

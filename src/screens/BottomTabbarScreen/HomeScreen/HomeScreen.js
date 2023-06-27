@@ -7,16 +7,15 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
+  Image,
 } from "react-native";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 const { width, height } = Dimensions.get("window");
 
-const GOOGLE_MAPS_APIKEY = "AIzaSyCYvMpmVhFc0ydILEuXGJNYNGFnBoKPCL8";
-
-const HomeScreen = () => {
+const HomeScreen = ({ route }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [searchValue, setSearchValue] = useState("");
 
@@ -44,91 +43,12 @@ const HomeScreen = () => {
     // Arama işlemini burada gerçekleştirin veya işleme fonksiyonunu çağırın
     console.log("Aranan kelime:", text);
   };
-  const locations = [
-    {
-      id: 1,
-      latitude: 41.0069,
-      longitude: 28.7806,
-      title: "Konum 1",
-      description: "Bu birinci konumdur.",
-    },
-    {
-      id: 2,
-      latitude: 41.0124,
-      longitude: 28.7783,
-      title: "Konum 2",
-      description: "Bu ikinci konumdur.",
-    },
-    {
-      id: 3,
-      latitude: 41.0118,
-      longitude: 28.7699,
-      title: "Konum 3",
-      description: "Bu üçüncü konumdur.",
-    },
-  ];
 
-  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
-  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const mapRef = useRef(null);
-  const markers = useRef({});
-  const flatListRef = useRef(null);
 
-  const handleCardPress = (index, id) => {
-    setSelectedCardIndex(index);
-    setSelectedMarkerId(id);
-    scrollToIndex(index);
-  };
 
-  const scrollToIndex = (index) => {
-    flatListRef.current.scrollToIndex({
-      animated: true,
-      index: index,
-      viewPosition: 0.5,
-    });
-  };
+  const { vehicleIcon } = route.params || {};
 
-  const renderLocationCard = ({ item, index }) => (
-    <TouchableOpacity
-      style={[
-        styles.locationCard,
-        selectedCardIndex === index && styles.selectedLocationCard,
-      ]}
-      onPress={() => handleCardPress(index, item.id)}
-    >
-      <Text style={styles.locationCardTitle}>{item.title}</Text>
-      <Text>{item.description}</Text>
-    </TouchableOpacity>
-  );
-
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setSelectedCardIndex(viewableItems[0].index);
-      setSelectedMarkerId(viewableItems[0].item.id);
-    }
-  }).current;
-
-  useEffect(() => {
-    if (selectedMarkerId !== null) {
-      Object.values(markers.current).forEach((marker) => {
-        marker.setNativeProps({ pinColor: "red" });
-      });
-
-      const selectedMarker = markers.current[selectedMarkerId];
-      if (selectedMarker) {
-        selectedMarker.setNativeProps({ pinColor: "green" });
-      }
-    } else {
-      Object.values(markers.current).forEach((marker) => {
-        marker.setNativeProps({ pinColor: "red" });
-      });
-    }
-  }, [selectedMarkerId]);
-
-  const CustomMarker = ({ id, selected }) => (
-
-    <Ionicons name="md-pin" size={32} color={selected ? "green" : "red"} />
-  );
 
   return (
     <View style={styles.container}>
@@ -141,8 +61,8 @@ const HomeScreen = () => {
             initialRegion={{
               latitude: currentLocation.latitude,
               longitude: currentLocation.longitude,
-              latitudeDelta: 0.015,
-              longitudeDelta: 0.0121,
+              latitudeDelta: 0.020,
+              longitudeDelta: 0.011,
             }}
           >
             <Marker
@@ -151,31 +71,18 @@ const HomeScreen = () => {
                 longitude: currentLocation.longitude,
               }}
               title="Current Location"
-            />
-          {locations.map((location) => (
-          <Marker
-            key={location.id}
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            title={location.title}
-            ref={(marker) => {
-              markers.current[location.id] = marker;
-            }}
-            onPress={() => {
-              setSelectedMarkerId(location.id);
-              scrollToIndex(
-                locations.findIndex((loc) => loc.id === location.id)
-              );
-            }}
-          >
-            <CustomMarker
-              id={location.id}
-              selected={selectedMarkerId === location.id}
-            />
-          </Marker>
-        ))}
+            >
+              {vehicleIcon == "electric-car" ? (
+                <Ionicons name="car-sport-sharp" size={34} color="#000000" />
+              ) : (
+                <MaterialCommunityIcons
+                  name="scooter"
+                  size={34}
+                  color="#000000"
+                />
+              )}
+            </Marker>
+
           </MapView>
         </>
       )}
@@ -191,28 +98,6 @@ const HomeScreen = () => {
         <View style={styles.menuContainer}>
           <Feather name="menu" size={30} color="#1C2129" />
         </View>
-      </View>
-
-      <View style={styles.locationCardContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={locations}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            ...styles.locationCardList,
-            marginLeft:
-              (Dimensions.get("window").width -
-                Dimensions.get("window").width * 0.8) / 2,
-              
-          }}
-          renderItem={renderLocationCard}
-          keyExtractor={(item) => item.id.toString()}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={{
-            itemVisiblePercentThreshold: 50, // Görünürlük yüzdesi thresholdu
-          }}
-        />
       </View>
     </View>
   );
@@ -291,7 +176,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
-    alignSelf:"center",
+    alignSelf: "center",
   },
   selectedLocationCard: {
     backgroundColor: "lightgreen",
@@ -307,7 +192,7 @@ const uberMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#1d2c4d",
+        color: "#eeeeee",
       },
     ],
   },
@@ -315,7 +200,7 @@ const uberMapStyle = [
     elementType: "labels.text.fill",
     stylers: [
       {
-        color: "#8ec3b9",
+        color: "#000",
       },
     ],
   },
@@ -323,7 +208,7 @@ const uberMapStyle = [
     elementType: "labels.text.stroke",
     stylers: [
       {
-        color: "#1a3646",
+        color: "#eeeeee",
       },
     ],
   },
@@ -332,7 +217,7 @@ const uberMapStyle = [
     elementType: "geometry.stroke",
     stylers: [
       {
-        color: "#4b6878",
+        color: "#C5C5C5",
       },
     ],
   },
@@ -350,7 +235,7 @@ const uberMapStyle = [
     elementType: "geometry.stroke",
     stylers: [
       {
-        color: "#4b6878",
+        color: "#C5C5C5",
       },
     ],
   },
@@ -359,7 +244,7 @@ const uberMapStyle = [
     elementType: "geometry.stroke",
     stylers: [
       {
-        color: "#334e87",
+        color: "#eee",
       },
     ],
   },
@@ -368,7 +253,7 @@ const uberMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#023e58",
+        color: "#C5C5C5",
       },
     ],
   },
@@ -377,7 +262,7 @@ const uberMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#283d6a",
+        color: "#C5C5C5",
       },
     ],
   },
@@ -386,7 +271,7 @@ const uberMapStyle = [
     elementType: "labels.text.fill",
     stylers: [
       {
-        color: "#6f9ba5",
+        color: "#000",
       },
     ],
   },
@@ -395,7 +280,7 @@ const uberMapStyle = [
     elementType: "labels.text.stroke",
     stylers: [
       {
-        color: "#1d2c4d",
+        color: "#eeeeee",
       },
     ],
   },
@@ -404,7 +289,7 @@ const uberMapStyle = [
     elementType: "geometry.fill",
     stylers: [
       {
-        color: "#023e58",
+        color: "#f5f5f5",
       },
     ],
   },
@@ -413,7 +298,7 @@ const uberMapStyle = [
     elementType: "labels.text.fill",
     stylers: [
       {
-        color: "#3C7680",
+        color: "#f5f5f5",
       },
     ],
   },
@@ -422,7 +307,7 @@ const uberMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#304a7d",
+        color: "#f5f5f5",
       },
     ],
   },
@@ -443,7 +328,7 @@ const uberMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#283d6a",
+        color: "red",
       },
     ],
   },
